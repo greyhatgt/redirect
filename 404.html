@@ -1,82 +1,85 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Redirecting...</title>
-    <script>
-      /**
-       * Configuration goes here
-       */
-      // Format: https://api.github.com/repos/{owner}/{repo}/issues/
-      var GITHUB_ISSUES_LINK =
-        "https://api.github.com/repos/greyhatgt/redirect/issues/";
-      var PATH_SEGMENTS_TO_SKIP = 1;
-      // List of allowed GitHub usernames (will only redirect for issues by these users)
-      var ALLOWED_USERS = ["SpiritSeal", "Caljorb"];
 
-      /**
-       * DO NOT TOUCH ANYTHING BELOW THIS COMMENT UNLESS YOU KNOW WHAT YOU ARE DOING
-       */
+<head>
+	<meta charset="utf-8" />
+	<title>Redirecting...</title>
+	<script>
+		/**
+		 * Configuration goes here
+		 */
+		// Format: https://api.github.com/repos/{owner}/{repo}/issues/
+		var GITHUB_ISSUES_LINK =
+			"https://api.github.com/repos/greyhatgt/redirect/issues/";
+		var PATH_SEGMENTS_TO_SKIP = 1;
+		// List of allowed GitHub usernames (will only redirect for issues by these users)
+		var ALLOWED_USERS = ["SpiritSeal", "Caljorb", "nash-pillai", "Jayden-Richmond"];
 
-      function isNumeric(num){ return !isNaN(num); }
-      function isUrl(url) {
-        return /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,24}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)+$/.test(url);
-      }
+		/**
+		 * DO NOT TOUCH ANYTHING BELOW THIS COMMENT UNLESS YOU KNOW WHAT YOU ARE DOING
+		 */
 
-      var isQuery = window.location.href.substr(-1) == "?";
-      var keyword = window.location.pathname.split("/")[PATH_SEGMENTS_TO_SKIP + 1];
+		function isNumeric(num) {return !isNaN(num);}
+		function isUrl(url) {
+			return /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,24}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)+$/.test(url);
+		}
 
-      var xhr = new XMLHttpRequest();
-      xhr.onload = function () {
-        var payload = JSON.parse(xhr.response);
-        var issue = "";
-        
-        // keyword is issue number
-        if (isNumeric(keyword)) {
-          issue = payload;
-        // keyword is shortened url name
-        } else {
-          for (var i=0; i<payload.length; i++) {
-            if (payload[i].body == keyword) {
-              // stop searching after first issue that matches
-              issue = payload[i];
-              break;
-            }
-          }
-        }
-        
-        // if something was returned through GH
-        if (issue != "") {
-          // check if author is in allowed users list
-          if (ALLOWED_USERS.includes(issue.user.login)) {
-            var url = issue.title;
-          } else {
-            var url = "Failed authentication (GitHub Issue not created by an authorized user)";
-          }
-        } else {
-          // no issue matched
-          var url = "Not found";
-        }
+		var isQuery = window.location.href.substr(-1) == "?";
+		var keyword = window.location.pathname.split("/")[PATH_SEGMENTS_TO_SKIP + 1];
 
-        // update page
-        document.getElementById("link").textContent = url;
+		var xhr = new XMLHttpRequest();
+		xhr.onload = function () {
+			var payload = JSON.parse(xhr.response);
+			var issue = "";
 
-        // if current url ends in '?', just display the full url
-        if (isUrl(url) && !isQuery) {
-          // redirect user
-          window.location.replace(url);
-        }
-      }
+			// keyword is issue number
+			if (isNumeric(keyword)) {
+				issue = payload;
+				// keyword is shortened url name
+			} else {
+				for (var i = 0; i < payload.length; i++) {
+					if (payload[i].body == keyword) {
+						// stop searching after first issue that matches
+						issue = payload[i];
+						break;
+					}
+				}
+			}
 
-      // Send XHR request
-      var api_url = GITHUB_ISSUES_LINK;
-      if (isNumeric(keyword)) { api_url += keyword; }
-      else { api_url = api_url.slice(0, -1); }
-      xhr.open("GET", api_url);
-      xhr.send();
-    </script>
-  </head>
-  <body>
-    <h1 id="link">Redirecting...</h1>
-  </body>
+			// if something was returned through GH
+			if (issue != "") {
+				// check if author is in allowed users list
+				if (ALLOWED_USERS.includes(issue.user.login)) {
+					var url = issue.title;
+				} else {
+					var url = "Failed authentication (GitHub Issue not created by an authorized user)";
+				}
+			} else {
+				// no issue matched
+				var url = "Not found";
+			}
+
+			// update page
+			document.getElementById("link").textContent = url;
+
+			// if current url ends in '?', just display the full url
+			if (isUrl(url) && !isQuery) {
+				// redirect user
+				window.location.replace(url);
+			}
+		}
+
+		// Send XHR request
+		var api_url = GITHUB_ISSUES_LINK;
+		if (isNumeric(keyword)) {api_url += keyword;}
+		else {api_url = api_url.slice(0, -1);}
+		xhr.open("GET", api_url);
+		xhr.send();
+	</script>
+</head>
+
+<body>
+	<h1 id="link">Redirecting...</h1>
+</body>
+
 </html>
